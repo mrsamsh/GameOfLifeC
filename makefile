@@ -5,7 +5,7 @@ UNAME=$(shell uname)
 ifeq ($(UNAME), Darwin)
 	CC=clang
 else
-	CC=g
+	CC=gcc
 endif
 
 SRC_DIR=./src
