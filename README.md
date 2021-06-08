@@ -13,6 +13,7 @@ cell_side
 frames_per_second
 ```
 
+Just cd to project folder and type:
 ```bash
 $ make run
 ```
