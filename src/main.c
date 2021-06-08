@@ -67,11 +67,7 @@ int main()
 	Game_Init(grid_width, grid_height, side, starting_cells);
 	
 	Game_GenerateRandom();
-//    game.insertPattern(50, 50,  9, 11, &cloverField[0]);
-//    game.insertPattern(200, 100, 18, 16, &hammerHead[0]);
-	
-//	game.insertPattern(100, 100, 3, 3, &glider[0]);
-//	game.insertPattern(88, 110, 2, 2, &square[0]);
+
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow(
 										  "Game of Life",
@@ -81,7 +77,7 @@ int main()
 										  window_height/ 2,
 										  SDL_WINDOW_SHOWN
 										  | SDL_WINDOW_ALLOW_HIGHDPI
-										  | SDL_WINDOW_FULLSCREEN//_DESKTOP
+										  | SDL_WINDOW_FULLSCREEN_DESKTOP
 										  | SDL_WINDOW_RESIZABLE
 										  );
 	
@@ -94,9 +90,9 @@ int main()
 	
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-//	if (SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengl", SDL_HINT_OVERRIDE) == SDL_TRUE) printf("Done\n");
-	Uint32 last, current;
-	Uint32 mspf = 1000 / c.fps;
+
+	uint32_t last, current;
+	uint32_t mspf = 1000 / c.fps;
 	last = SDL_GetTicks();
 	bool running = true;
 	unsigned int counter = 0;
