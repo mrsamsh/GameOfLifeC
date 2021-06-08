@@ -259,6 +259,26 @@ void Game_EvaluateCells() {
 	for (int i = 0; i < width * height; ++i) {
 		int count = Cell_Calculate(&current[i]);
 
+		switch (count) {
+			case 3:
+				next[i].v = 1;
+				next[i].f = 0;
+				break;
+			case 2:
+				next[i].v = (current[i].v == 1 ? 1 : 0);
+				break;
+			default:
+				switch (current[i].v) {
+					case 1:
+						next[i].v = 0;
+						next[i].f = 60;
+						break;
+					default:
+						next[i].v = 0;
+						next[i].f = MAX(0, current[i].f - 1);
+				}
+		}
+
 		/* switch (current[i].v) { */
 		/* 	case 1: */
 		/* 	{ */
@@ -282,22 +302,28 @@ void Game_EvaluateCells() {
 		/* 				break; */
 		/* 			default: */
 		/* 				next[i].v = 0; */
-		/* 				next[i].f = MAX(current[i].f - 1, 0); */
+		/* 				switch (current[i].f) { */
+		/* 					case 0: */
+		/* 						next[i].f = 0; */
+		/* 						break; */
+		/* 					default: */
+		/* 						next[i].f = current[i].f -1; */
+		/* 				} */
 		/* 				break; */
 		/* 		} */
 		/* 	} break; */
 		/* } */
 
-		if ((count < 2 || count > 3) && current[i].v == 1) {
-			next[i].v = 0;
-			next[i].f = 60;
-		} else if (count == 3 && current[i].v != 1) {
-			next[i].v = 1;
-			next[i].f = 0;
-		} else {
-			next[i].v = current[i].v;
-			next[i].f = MAX(current[i].f - 1, 0);
-		}
+		/* if ((count < 2 || count > 3) && current[i].v == 1) { */
+		/* 	next[i].v = 0; */
+		/* 	next[i].f = 60; */
+		/* } else if (count == 3 && current[i].v != 1) { */
+		/* 	next[i].v = 1; */
+		/* 	next[i].f = 0; */
+		/* } else { */
+		/* 	next[i].v = current[i].v; */
+		/* 	next[i].f = MAX(current[i].f - 1, 0); */
+		/* } */
 	}
 }
 
