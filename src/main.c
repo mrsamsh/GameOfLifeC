@@ -57,8 +57,8 @@ int main()
 	file = fopen("config.txt", "r");
 	fscanf(file, "%d\n%d\n%d\n%d\n", &c.window_width, &c.window_height, &c.side, &c.fps);
 		
-	int window_width = c.window_width * 2;
-	int window_height = c.window_height * 2;
+	int window_width = c.window_width;
+	int window_height = c.window_height;
 	int side = c.side;
 	int grid_width = window_width / side;
 	int grid_height = window_height / side;
