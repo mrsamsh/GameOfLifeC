@@ -265,18 +265,18 @@ void Game_EvaluateCells() {
 				next[i].f = 0;
 				break;
 			case 2:
-				next[i].v = (current[i].v == 1 ? 1 : 0);
+				next[i].v = current[i].v;
 				break;
 			default:
+				next[i].v = 0;
 				switch (current[i].v) {
 					case 1:
-						next[i].v = 0;
 						next[i].f = 60;
 						break;
 					default:
-						next[i].v = 0;
 						next[i].f = MAX(0, current[i].f - 1);
 				}
+				break;
 		}
 
 		/* switch (current[i].v) { */
