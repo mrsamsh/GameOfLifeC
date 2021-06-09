@@ -263,10 +263,10 @@ void Game_EvaluateCells() {
 			case 3:
 				next[i].v = 1;
 				next[i].f = 0;
-				break;
+				continue;
 			case 2:
 				next[i].v = current[i].v;
-				break;
+				continue;
 			default:
 				next[i].v = 0;
 				switch (current[i].v) {
