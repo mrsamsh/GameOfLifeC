@@ -16,8 +16,8 @@ void Game_Init(int grid_width, int grid_height, int side, int starting_cells);
 
 void Game_GenerateRandom();
 void Game_InsertPattern(int xpos, int ypos, int width, int height, const int8_t *pattern);
-void Game_Draw(SDL_Renderer *);
-void Game_EvaluateCells();
+void *Game_Draw(void *);
+void Game_EvaluateCells(SDL_Renderer *);
 void Game_Swap();
 void Game_Destroy();
 

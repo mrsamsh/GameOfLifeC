@@ -265,8 +265,8 @@ void Game_Swap() {
 	next = temp;
 }
 
-void * _evaluateCells1(void *) {
-	int begin = 0, end = width * height / 2;
+void * _evaluateCells1(void *param) {
+	int begin = 0, end = width * height / 4;
 	for (int i = begin; i < end; ++i) {
 		int count = Cell_Calculate(&current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
@@ -282,8 +282,8 @@ void * _evaluateCells1(void *) {
 	}
 	return NULL;
 }
-void * _evaluateCells2(void *) {
-	int begin = width * height / 2, end = width * height;
+void * _evaluateCells2(void *param) {
+	int begin = width * height / 4, end = width * height / 2;
 	for (int i = begin; i < end; ++i) {
 		int count = Cell_Calculate(&current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
@@ -300,19 +300,59 @@ void * _evaluateCells2(void *) {
 	return NULL;
 }
 
-void Game_EvaluateCells() {
-	pthread_t t1, t2;
+void * _evaluateCells3(void *param) {
+	int begin = width * height / 2, end = width * height * 3 / 4;
+	for (int i = begin; i < end; ++i) {
+		int count = Cell_Calculate(&current[i]);
+		if ((count < 2 || count > 3) && current[i].v == 1) {
+			next[i].v = 0;
+			next[i].f = 60;
+		} else if (count == 3 && current[i].v != 1) {
+			next[i].v = 1;
+			next[i].f = 0;
+		} else {
+			next[i].v = current[i].v;
+			next[i].f = MAX(current[i].f - 1, 0);
+		}
+	}
+	return NULL;
+}
+
+void * _evaluateCells4(void *param) {
+	int begin = width * height * 3 / 4, end = width * height;
+	for (int i = begin; i < end; ++i) {
+		int count = Cell_Calculate(&current[i]);
+		if ((count < 2 || count > 3) && current[i].v == 1) {
+			next[i].v = 0;
+			next[i].f = 60;
+		} else if (count == 3 && current[i].v != 1) {
+			next[i].v = 1;
+			next[i].f = 0;
+		} else {
+			next[i].v = current[i].v;
+			next[i].f = MAX(current[i].f - 1, 0);
+		}
+	}
+	return NULL;
+}
+void Game_EvaluateCells(SDL_Renderer *renderer) {
+#ifdef THREAD_RUN
+	pthread_t t1, t2, t3, t4, t5;
 
 	pthread_create(&t1, NULL, _evaluateCells1, NULL);
-
 	pthread_create(&t2, NULL, _evaluateCells2, NULL);
+	pthread_create(&t3, NULL, _evaluateCells3, NULL);
+	pthread_create(&t4, NULL, _evaluateCells4, NULL);
+	pthread_create(&t5, NULL, Game_Draw, renderer);
 	
 	pthread_join(t1, NULL);
 	pthread_join(t2, NULL);
-	
-
-	/* for (int i = 0; i < width * height; ++i) { */
-	/* 	int count = Cell_Calculate(&current[i]); */
+	pthread_join(t3, NULL);
+	pthread_join(t4, NULL);
+	pthread_join(t5, NULL);
+#else	
+	for (int i = 0; i < width * height; ++i) {
+		int count = Cell_Calculate(&current[i]);
 
 		/* switch (count) { */
 		/* 	case 3: */
@@ -369,20 +409,23 @@ void Game_EvaluateCells() {
 		/* 	} break; */
 		/* } */
 
-		/* if ((count < 2 || count > 3) && current[i].v == 1) { */
-		/* 	next[i].v = 0; */
-		/* 	next[i].f = 60; */
-		/* } else if (count == 3 && current[i].v != 1) { */
-		/* 	next[i].v = 1; */
-		/* 	next[i].f = 0; */
-		/* } else { */
-		/* 	next[i].v = current[i].v; */
-		/* 	next[i].f = MAX(current[i].f - 1, 0); */
-		/* } */
-	/* } */
+		if ((count < 2 || count > 3) && current[i].v == 1) {
+			next[i].v = 0;
+			next[i].f = 60;
+		} else if (count == 3 && current[i].v != 1) {
+			next[i].v = 1;
+			next[i].f = 0;
+		} else {
+			next[i].v = current[i].v;
+			next[i].f = MAX(current[i].f - 1, 0);
+		}
+	}
+	Game_Draw(renderer);
+#endif
 }
 
-void Game_Draw(SDL_Renderer *renderer) {
+void *Game_Draw(void *r) {
+	SDL_Renderer *renderer = (SDL_Renderer *)r;
 	for (int i = 0; i < width * height; ++i) {
 
 		if (current[i].v == 1) {
@@ -482,6 +525,7 @@ void Game_Draw(SDL_Renderer *renderer) {
 		/* 	SDL_RenderFillRect(renderer, &rects[i]); */
 		/* } */
 	}
+	return NULL;
 }
 
 void Game_Destroy() {

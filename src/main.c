@@ -141,13 +141,10 @@ int main()
 		SDL_RenderClear(renderer);
 		uint32_t beforeEval = SDL_GetTicks();
 		if (!paused) {
-			Game_EvaluateCells();
+			Game_EvaluateCells(renderer);
 			Game_Swap();
 		}
 		uint32_t afterEval = SDL_GetTicks();
-		printf("Evaluete: %d\n", afterEval - beforeEval);
-		Game_Draw(renderer);
-		printf("Render: %d\n", SDL_GetTicks() - afterEval);
 		
 		SDL_RenderPresent(renderer);
 		current = SDL_GetTicks();
