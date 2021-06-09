@@ -49,13 +49,13 @@ int8_t square[] = {
 	1, 1
 };
 
-struct { int window_width, window_height, side, fps; } c;
+struct { int window_width, window_height, side, fps, display; } c;
 
 int main()
 {
 	FILE *file;
 	file = fopen("config.txt", "r");
-	fscanf(file, "%d\n%d\n%d\n%d\n", &c.window_width, &c.window_height, &c.side, &c.fps);
+	fscanf(file, "%d\n%d\n%d\n%d\n%d", &c.window_width, &c.window_height, &c.side, &c.fps, &c.display);
 		
 	int window_width = c.window_width;
 	int window_height = c.window_height;
@@ -71,8 +71,8 @@ int main()
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow(
 										  "Game of Life",
-										  SDL_WINDOWPOS_CENTERED_DISPLAY(2),
-										  SDL_WINDOWPOS_CENTERED_DISPLAY(2),
+										  SDL_WINDOWPOS_CENTERED_DISPLAY(c.display),
+										  SDL_WINDOWPOS_CENTERED_DISPLAY(c.display),
 										  window_width / 2,
 										  window_height/ 2,
 										  SDL_WINDOW_SHOWN
