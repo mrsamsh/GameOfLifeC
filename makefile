@@ -1,4 +1,4 @@
-CFLAGS=-I./include -O3 -std=gnu11
+CFLAGS=-I./include -O3 -std=c11
 LFLAGS=-lSDL2 -lpthread
 
 UNAME=$(shell uname)
