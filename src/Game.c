@@ -12,6 +12,8 @@
 #include "Game.h"
 #include <time.h>
 #include <math.h>
+#include <pthread.h>
+#include <threads.h>
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
@@ -33,6 +35,7 @@ Cell *state1;
 Cell *state2;
 Cell *current;
 Cell *next;
+SDL_Rect *rects;
 
 int Cell_Calculate(const Cell *cell) {
 	return *(cell->nw) + *(cell->n) + *(cell->ne) + *(cell->w) + *(cell->e) + *(cell->sw) + *(cell->s) + *(cell->se);
@@ -226,6 +229,14 @@ void Game_Init(int grid_width, int grid_height, int cell_side, int starting) {
 	state2[width * height - 1].ne = &state2[width * (height - 2)].v;
 	state2[width * height - 1].sw = &state2[width - 2].v;
 	state2[width * height - 1].se = &state2[0].v;
+
+	rects = malloc(sizeof(SDL_Rect) * width * height);
+
+	for (int i = 0; i < width * height; ++i) {
+		int x = (i % width) * side + 1;
+		int y = (i / width) * side + 1;
+		rects[i] = (SDL_Rect){ x, y, side - 1, side -1 };
+	}
 }
 
 void Game_GenerateRandom() {
@@ -255,29 +266,61 @@ void Game_Swap() {
 	next = temp;
 }
 
-void Game_EvaluateCells() {
-	for (int i = 0; i < width * height; ++i) {
+void *_evaluateCells(void *param) {
+	int *values = (int *)param;
+	int begin = values[0], end = values[1];
+	for (int i = begin; i < end; ++i) {
 		int count = Cell_Calculate(&current[i]);
-
-		switch (count) {
-			case 3:
-				next[i].v = 1;
-				next[i].f = 0;
-				continue;
-			case 2:
-				next[i].v = current[i].v;
-				continue;
-			default:
-				next[i].v = 0;
-				switch (current[i].v) {
-					case 1:
-						next[i].f = 60;
-						break;
-					default:
-						next[i].f = MAX(0, current[i].f - 1);
-				}
-				break;
+		if ((count < 2 || count > 3) && current[i].v == 1) {
+			next[i].v = 0;
+			next[i].f = 60;
+		} else if (count == 3 && current[i].v != 1) {
+			next[i].v = 1;
+			next[i].f = 0;
+		} else {
+			next[i].v = current[i].v;
+			next[i].f = MAX(current[i].f - 1, 0);
 		}
+	}
+	return NULL;
+}
+
+void Game_EvaluateCells() {
+	pthread_t t1, t2;
+	int values[2];
+	values[0] = 0;
+	values[1] = width * height / 2;
+	pthread_create(&t1, NULL, _evaluateCells, values);
+	values[0] = width * height / 2;
+	values[1] = width * height;
+	pthread_create(&t2, NULL, _evaluateCells, values);
+	
+	pthread_join(t2, NULL);
+	pthread_join(t1, NULL);
+	
+
+	/* for (int i = 0; i < width * height; ++i) { */
+	/* 	int count = Cell_Calculate(&current[i]); */
+
+		/* switch (count) { */
+		/* 	case 3: */
+		/* 		next[i].v = 1; */
+		/* 		next[i].f = 0; */
+		/* 		continue; */
+		/* 	case 2: */
+		/* 		next[i].v = current[i].v; */
+		/* 		continue; */
+		/* 	default: */
+		/* 		next[i].v = 0; */
+		/* 		switch (current[i].v) { */
+		/* 			case 1: */
+		/* 				next[i].f = 60; */
+		/* 				break; */
+		/* 			default: */
+		/* 				next[i].f = MAX(0, current[i].f - 1); */
+		/* 		} */
+		/* 		break; */
+		/* } */
 
 		/* switch (current[i].v) { */
 		/* 	case 1: */
@@ -324,26 +367,113 @@ void Game_EvaluateCells() {
 		/* 	next[i].v = current[i].v; */
 		/* 	next[i].f = MAX(current[i].f - 1, 0); */
 		/* } */
-	}
+	/* } */
 }
 
 void Game_Draw(SDL_Renderer *renderer) {
 	for (int i = 0; i < width * height; ++i) {
-		int x = (i % width) * side + 1;
-		int y = (i / width) * side + 1;
-		SDL_Rect r = { x, y, side - 1, side -1 };
+
+	/* 	if (current[i].v == 1) { */
+	/* 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff); */
+	/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 		continue; */
+	/* 	} */
+	/* 	switch (current[i].f) { */
+	/* 		case 60: */
+	/* 		case 59: */
+	/* 		case 58: */
+	/* 		case 57: */
+	/* 		case 56: */
+	/* 		case 55: */
+	/* 		case 54: */
+	/* 		case 53: */
+	/* 		case 52: */
+	/* 		case 51: */
+	/* 			SDL_SetRenderDrawColor(renderer, 0x30, 0x30, 0xc0, 0xff); */
+	/* 			SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 			continue; */
+	/* 		case 50: */
+	/* 		case 49: */
+	/* 		case 48: */
+	/* 		case 47: */
+	/* 		case 46: */
+	/* 		case 45: */
+	/* 		case 44: */
+	/* 		case 43: */
+	/* 		case 42: */
+	/* 		case 41: */
+	/* 			SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff); */
+	/* 			SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 			continue; */
+	/* 		case 40: */
+	/* 		case 39: */
+	/* 		case 38: */
+	/* 		case 37: */
+	/* 		case 36: */
+	/* 		case 35: */
+	/* 		case 34: */
+	/* 		case 33: */
+	/* 		case 32: */
+	/* 		case 31: */
+	/* 			SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff); */
+	/* 			SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 			continue; */
+	/* 		case 30: */
+	/* 		case 29: */
+	/* 		case 28: */
+	/* 		case 27: */
+	/* 		case 26: */
+	/* 		case 25: */
+	/* 		case 24: */
+	/* 		case 23: */
+	/* 		case 22: */
+	/* 		case 21: */
+	/* 			SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff); */
+	/* 			SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 			continue; */
+	/* 		case 20: */
+	/* 		case 19: */
+	/* 		case 18: */
+	/* 		case 17: */
+	/* 		case 16: */
+	/* 		case 15: */
+	/* 		case 14: */
+	/* 		case 13: */
+	/* 		case 12: */
+	/* 		case 11: */
+	/* 			SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff); */
+	/* 			SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 			continue; */
+	/* 		case 10: */
+	/* 		case 9: */
+	/* 		case 8: */
+	/* 		case 7: */
+	/* 		case 6: */
+	/* 		case 5: */
+	/* 		case 4: */
+	/* 		case 3: */
+	/* 		case 2: */
+	/* 		case 1: */
+	/* 			SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff); */
+	/* 			SDL_RenderFillRect(renderer, &rects[i]); */
+	/* 			continue; */
+	/* 		default: */
+	/* 			continue; */
+				
+	/* 	} */
 		
 		if (current[i].f != 0) {
 			SDL_SetRenderDrawColor(renderer, 0x01 * current[i].f / 2, 0x01 * current[i].f / 2, 0x02 * current[i].f, 0xff);
-			SDL_RenderFillRect(renderer, &r);
+			SDL_RenderFillRect(renderer, &rects[i]);
 		} else if (current[i].v != 0) {
 			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			SDL_RenderFillRect(renderer, &r);
+			SDL_RenderFillRect(renderer, &rects[i]);
 		}
 	}
 }
 
 void Game_Destroy() {
+	free(rects);
 	free(state1);
 	free(state2);
 }
