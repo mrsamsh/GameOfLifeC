@@ -287,7 +287,7 @@ void * _evaluateCells1(void *param) {
 		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
-			next[i].f = 60;
+			next[i].f = 20;
 		} else if (count == 3 && current[i].v != 1) {
 			next[i].v = 1;
 			next[i].f = 0;
@@ -304,7 +304,7 @@ void * _evaluateCells2(void *param) {
 		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
-			next[i].f = 60;
+			next[i].f = 20;
 		} else if (count == 3 && current[i].v != 1) {
 			next[i].v = 1;
 			next[i].f = 0;
@@ -322,7 +322,7 @@ void * _evaluateCells3(void *param) {
 		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
-			next[i].f = 60;
+			next[i].f = 20;
 		} else if (count == 3 && current[i].v != 1) {
 			next[i].v = 1;
 			next[i].f = 0;
@@ -340,7 +340,7 @@ void * _evaluateCells4(void *param) {
 		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
-			next[i].f = 60;
+			next[i].f = 20;
 		} else if (count == 3 && current[i].v != 1) {
 			next[i].v = 1;
 			next[i].f = 0;
@@ -351,94 +351,102 @@ void * _evaluateCells4(void *param) {
 	}
 	return NULL;
 }
-void Game_EvaluateCells(SDL_Renderer *renderer) {
+void Game_EvaluateCells(SDL_Renderer *renderer, int paused) {
 #ifdef THREAD_RUN
 	pthread_t t1, t2, t3, t4, t5;
-
-	pthread_create(&t1, NULL, _evaluateCells1, NULL);
-	pthread_create(&t2, NULL, _evaluateCells2, NULL);
-	pthread_create(&t3, NULL, _evaluateCells3, NULL);
-	pthread_create(&t4, NULL, _evaluateCells4, NULL);
+	if (!paused) {
+		pthread_create(&t1, NULL, _evaluateCells1, NULL);
+		pthread_create(&t2, NULL, _evaluateCells2, NULL);
+		pthread_create(&t3, NULL, _evaluateCells3, NULL);
+		pthread_create(&t4, NULL, _evaluateCells4, NULL);
+	}
 	pthread_create(&t5, NULL, Game_Draw, renderer);
 	
-	pthread_join(t1, NULL);
-	pthread_join(t2, NULL);
-	pthread_join(t3, NULL);
-	pthread_join(t4, NULL);
+	if (!paused) {
+		pthread_join(t1, NULL);
+		pthread_join(t2, NULL);
+		pthread_join(t3, NULL);
+		pthread_join(t4, NULL);
+	}
 	pthread_join(t5, NULL);
 #else	
-	for (int i = 0; i < width * height; ++i) {
-		int count = CALCULATE_CELL(current[i]);
+	if (!paused) {
+		for (int i = 0; i < width * height; ++i) {
+			int count = CALCULATE_CELL(current[i]);
 
-		/* switch (count) { */
-		/* 	case 3: */
-		/* 		next[i].v = 1; */
-		/* 		next[i].f = 0; */
-		/* 		continue; */
-		/* 	case 2: */
-		/* 		next[i].v = current[i].v; */
-		/* 		continue; */
-		/* 	default: */
-		/* 		next[i].v = 0; */
-		/* 		switch (current[i].v) { */
-		/* 			case 1: */
-		/* 				next[i].f = 60; */
-		/* 				break; */
-		/* 			default: */
-		/* 				next[i].f = MAX(0, current[i].f - 1); */
-		/* 		} */
-		/* 		break; */
-		/* } */
+			/* switch (count) { */
+			/* 	case 3: */
+			/* 		next[i].v = 1; */
+			/* 		next[i].f = 0; */
+			/* 		continue; */
+			/* 	case 2: */
+			/* 		next[i].v = current[i].v; */
+			/* 		continue; */
+			/* 	default: */
+			/* 		next[i].v = 0; */
+			/* 		switch (current[i].v) { */
+			/* 			case 1: */
+			/* 				next[i].f = 60; */
+			/* 				break; */
+			/* 			default: */
+			/* 				next[i].f = MAX(0, current[i].f - 1); */
+			/* 		} */
+			/* 		break; */
+			/* } */
 
-		/* switch (current[i].v) { */
-		/* 	case 1: */
-		/* 	{ */
-		/* 		switch (count) { */
-		/* 			case 2: */
-		/* 			case 3: */
-		/* 				next[i].v = 1; */
-		/* 				break; */
-		/* 			default: */
-		/* 				next[i].v = 0; */
-		/* 				next[i].f = 60; */
-		/* 				break; */
-		/* 		} */
-		/* 	} break; */
-		/* 	default: */
-		/* 	{ */
-		/* 		switch (count) { */
-		/* 			case 3: */
-		/* 				next[i].v = 1; */
-		/* 				next[i].f = 0; */
-		/* 				break; */
-		/* 			default: */
-		/* 				next[i].v = 0; */
-		/* 				switch (current[i].f) { */
-		/* 					case 0: */
-		/* 						next[i].f = 0; */
-		/* 						break; */
-		/* 					default: */
-		/* 						next[i].f = current[i].f -1; */
-		/* 				} */
-		/* 				break; */
-		/* 		} */
-		/* 	} break; */
-		/* } */
+			/* switch (current[i].v) { */
+			/* 	case 1: */
+			/* 	{ */
+			/* 		switch (count) { */
+			/* 			case 2: */
+			/* 			case 3: */
+			/* 				next[i].v = 1; */
+			/* 				break; */
+			/* 			default: */
+			/* 				next[i].v = 0; */
+			/* 				next[i].f = 60; */
+			/* 				break; */
+			/* 		} */
+			/* 	} break; */
+			/* 	default: */
+			/* 	{ */
+			/* 		switch (count) { */
+			/* 			case 3: */
+			/* 				next[i].v = 1; */
+			/* 				next[i].f = 0; */
+			/* 				break; */
+			/* 			default: */
+			/* 				next[i].v = 0; */
+			/* 				switch (current[i].f) { */
+			/* 					case 0: */
+			/* 						next[i].f = 0; */
+			/* 						break; */
+			/* 					default: */
+			/* 						next[i].f = current[i].f -1; */
+			/* 				} */
+			/* 				break; */
+			/* 		} */
+			/* 	} break; */
+			/* } */
 
-		if ((count < 2 || count > 3) && current[i].v == 1) {
-			next[i].v = 0;
-			next[i].f = 60;
-		} else if (count == 3 && current[i].v != 1) {
-			next[i].v = 1;
-			next[i].f = 0;
-		} else {
-			next[i].v = current[i].v;
-			next[i].f = MAX(current[i].f - 1, 0);
+			if ((count < 2 || count > 3) && current[i].v == 1) {
+				next[i].v = 0;
+				next[i].f = 20;
+			} else if (count == 3 && current[i].v != 1) {
+				next[i].v = 1;
+				next[i].f = 0;
+			} else {
+				next[i].v = current[i].v;
+				next[i].f = MAX(current[i].f - 1, 0);
+			}
 		}
 	}
 	Game_Draw(renderer);
 #endif
+	if (!paused)
+		Game_Swap();
 }
+
 
 void *Game_Draw(void *r) {
 	SDL_Renderer *renderer = (SDL_Renderer *)r;
@@ -449,97 +457,46 @@ void *Game_Draw(void *r) {
 			SDL_RenderFillRect(renderer, &rects[i]);
 			continue;
 		}
-		/* switch (current[i].f) { */
-		/* 	case 60: */
-		/* 	case 59: */
-		/* 	case 58: */
-		/* 	case 57: */
-		/* 	case 56: */
-		/* 	case 55: */
-		/* 	case 54: */
-		/* 	case 53: */
-		/* 	case 52: */
-		/* 	case 51: */
-		/* 		SDL_SetRenderDrawColor(renderer, 0x30, 0x30, 0xc0, 0xff); */
-		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
-		/* 		continue; */
-		/* 	case 50: */
-		/* 	case 49: */
-		/* 	case 48: */
-		/* 	case 47: */
-		/* 	case 46: */
-		/* 	case 45: */
-		/* 	case 44: */
-		/* 	case 43: */
-		/* 	case 42: */
-		/* 	case 41: */
-		/* 		SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff); */
-		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
-		/* 		continue; */
-		/* 	case 40: */
-		/* 	case 39: */
-		/* 	case 38: */
-		/* 	case 37: */
-		/* 	case 36: */
-		/* 	case 35: */
-		/* 	case 34: */
-		/* 	case 33: */
-		/* 	case 32: */
-		/* 	case 31: */
-		/* 		SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff); */
-		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
-		/* 		continue; */
-		/* 	case 30: */
-		/* 	case 29: */
-		/* 	case 28: */
-		/* 	case 27: */
-		/* 	case 26: */
-		/* 	case 25: */
-		/* 	case 24: */
-		/* 	case 23: */
-		/* 	case 22: */
-		/* 	case 21: */
-		/* 		SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff); */
-		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
-		/* 		continue; */
-		/* 	case 20: */
-		/* 	case 19: */
-		/* 	case 18: */
-		/* 	case 17: */
-		/* 	case 16: */
-		/* 	case 15: */
-		/* 	case 14: */
-		/* 	case 13: */
-		/* 	case 12: */
-		/* 	case 11: */
-		/* 		SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff); */
-		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
-		/* 		continue; */
-		/* 	case 10: */
-		/* 	case 9: */
-		/* 	case 8: */
-		/* 	case 7: */
-		/* 	case 6: */
-		/* 	case 5: */
-		/* 	case 4: */
-		/* 	case 3: */
-		/* 	case 2: */
-		/* 	case 1: */
-		/* 		SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff); */
-		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
-		/* 		continue; */
-		/* 	default: */
-		/* 		continue; */
+		switch (current[i].f) {
+			case 20:
+			case 19:
+			case 18:
+			case 17:
+				SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff);
+				SDL_RenderFillRect(renderer, &rects[i]);
+				continue;
+			case 16:
+			case 15:
+			case 14:
+			case 13:
+				SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff);
+				SDL_RenderFillRect(renderer, &rects[i]);
+				continue;
+			case 12:
+			case 11:
+			case 10:
+			case 9:
+				SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff);
+				SDL_RenderFillRect(renderer, &rects[i]);
+				continue;
+			case 8:
+			case 7:
+			case 6:
+			case 5:
+				SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff);
+				SDL_RenderFillRect(renderer, &rects[i]);
+				continue;
+			case 4:
+			case 3:
+			case 2:
+			case 1:
+				SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff);
+				SDL_RenderFillRect(renderer, &rects[i]);
+				continue;
+			default:
+				continue;
 				
-		/* } */
-		
-		/* if (current[i].f != 0) { */
-		/* 	SDL_SetRenderDrawColor(renderer, 0x01 * current[i].f / 2, 0x01 * current[i].f / 2, 0x02 * current[i].f, 0xff); */
-		/* 	SDL_RenderFillRect(renderer, &rects[i]); */
-		/* } else if (current[i].v != 0) { */
-		/* 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff); */
-		/* 	SDL_RenderFillRect(renderer, &rects[i]); */
-		/* } */
+		}
 	}
 	return NULL;
 }

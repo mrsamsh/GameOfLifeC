@@ -77,7 +77,7 @@ int main()
 										  window_height/ 2,
 										  SDL_WINDOW_SHOWN
 										  | SDL_WINDOW_ALLOW_HIGHDPI
-										  | SDL_WINDOW_FULLSCREEN_DESKTOP
+										  | SDL_WINDOW_FULLSCREEN//_DESKTOP
 										  | SDL_WINDOW_RESIZABLE
 										  );
 	
@@ -98,6 +98,7 @@ int main()
 	unsigned int counter = 0;
 	uint32_t time = SDL_GetTicks();
 	bool paused = false;
+	bool shadows = true;
 	while (running) {
 		counter++;
 		SDL_Event event;
@@ -133,6 +134,8 @@ int main()
 					Game_GenerateRandom();
 				} else if (event.key.keysym.sym == SDLK_SPACE) {
 					paused = !paused;
+				} else if (event.key.keysym.sym == SDLK_s) {
+					shadows = !shadows;
 				}
 			}
 		}
@@ -140,10 +143,7 @@ int main()
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x66);
 		SDL_RenderClear(renderer);
 		uint32_t beforeEval = SDL_GetTicks();
-		if (!paused) {
-			Game_EvaluateCells(renderer);
-			Game_Swap();
-		}
+		Game_EvaluateCells(renderer, paused);
 		uint32_t afterEval = SDL_GetTicks();
 		
 		SDL_RenderPresent(renderer);
