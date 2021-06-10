@@ -9,6 +9,8 @@
 // All rights reserved 2021
 //
 
+#define CALCULATE_CELL(cell) (*(cell.nw) + *(cell.n) + *(cell.ne) + *(cell.w) + *(cell.e) + *(cell.sw) + *(cell.s) + *(cell.se))
+
 #include "Game.h"
 #include <time.h>
 #include <math.h>
@@ -242,12 +244,26 @@ void Game_GenerateRandom() {
 	srand(time(NULL));
 	for (int i = 0; i < width * height; ++i) {
 		current[i].v = 0;
+		next[i].v = 0;
+		current[i].f = 0;
+		next[i].f = 0;
 	}
 	for (int i = 0; i < starting_cells; ++i) {
 		int x = rand() % width;
 		int y = rand() % height;
 		current[x + y * width].v = 1;
 	}
+	for (int i = 0; i < width * height; ++i) {
+		int count = CALCULATE_CELL(current[i]);
+		if ((count < 2 || count > 3) && current[i].v == 1) {
+			next[i].v = 0;
+		} else if (count == 3 && current[i].v != 1) {
+			next[i].v = 1;
+		} else {
+			next[i].v = current[i].v;
+		}
+	}
+	Game_Swap();
 }
 
 void Game_InsertPattern(int xpos, int ypos, int width, int height, const int8_t *pattern) {
@@ -268,7 +284,7 @@ void Game_Swap() {
 void * _evaluateCells1(void *param) {
 	int begin = 0, end = width * height / 4;
 	for (int i = begin; i < end; ++i) {
-		int count = Cell_Calculate(&current[i]);
+		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
 			next[i].f = 60;
@@ -285,7 +301,7 @@ void * _evaluateCells1(void *param) {
 void * _evaluateCells2(void *param) {
 	int begin = width * height / 4, end = width * height / 2;
 	for (int i = begin; i < end; ++i) {
-		int count = Cell_Calculate(&current[i]);
+		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
 			next[i].f = 60;
@@ -303,7 +319,7 @@ void * _evaluateCells2(void *param) {
 void * _evaluateCells3(void *param) {
 	int begin = width * height / 2, end = width * height * 3 / 4;
 	for (int i = begin; i < end; ++i) {
-		int count = Cell_Calculate(&current[i]);
+		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
 			next[i].f = 60;
@@ -321,7 +337,7 @@ void * _evaluateCells3(void *param) {
 void * _evaluateCells4(void *param) {
 	int begin = width * height * 3 / 4, end = width * height;
 	for (int i = begin; i < end; ++i) {
-		int count = Cell_Calculate(&current[i]);
+		int count = CALCULATE_CELL(current[i]);
 		if ((count < 2 || count > 3) && current[i].v == 1) {
 			next[i].v = 0;
 			next[i].f = 60;
@@ -352,7 +368,7 @@ void Game_EvaluateCells(SDL_Renderer *renderer) {
 	pthread_join(t5, NULL);
 #else	
 	for (int i = 0; i < width * height; ++i) {
-		int count = Cell_Calculate(&current[i]);
+		int count = CALCULATE_CELL(current[i]);
 
 		/* switch (count) { */
 		/* 	case 3: */
@@ -433,89 +449,89 @@ void *Game_Draw(void *r) {
 			SDL_RenderFillRect(renderer, &rects[i]);
 			continue;
 		}
-		switch (current[i].f) {
-			case 60:
-			case 59:
-			case 58:
-			case 57:
-			case 56:
-			case 55:
-			case 54:
-			case 53:
-			case 52:
-			case 51:
-				SDL_SetRenderDrawColor(renderer, 0x30, 0x30, 0xc0, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 50:
-			case 49:
-			case 48:
-			case 47:
-			case 46:
-			case 45:
-			case 44:
-			case 43:
-			case 42:
-			case 41:
-				SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 40:
-			case 39:
-			case 38:
-			case 37:
-			case 36:
-			case 35:
-			case 34:
-			case 33:
-			case 32:
-			case 31:
-				SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 30:
-			case 29:
-			case 28:
-			case 27:
-			case 26:
-			case 25:
-			case 24:
-			case 23:
-			case 22:
-			case 21:
-				SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 20:
-			case 19:
-			case 18:
-			case 17:
-			case 16:
-			case 15:
-			case 14:
-			case 13:
-			case 12:
-			case 11:
-				SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 10:
-			case 9:
-			case 8:
-			case 7:
-			case 6:
-			case 5:
-			case 4:
-			case 3:
-			case 2:
-			case 1:
-				SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			default:
-				continue;
+		/* switch (current[i].f) { */
+		/* 	case 60: */
+		/* 	case 59: */
+		/* 	case 58: */
+		/* 	case 57: */
+		/* 	case 56: */
+		/* 	case 55: */
+		/* 	case 54: */
+		/* 	case 53: */
+		/* 	case 52: */
+		/* 	case 51: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x30, 0x30, 0xc0, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 50: */
+		/* 	case 49: */
+		/* 	case 48: */
+		/* 	case 47: */
+		/* 	case 46: */
+		/* 	case 45: */
+		/* 	case 44: */
+		/* 	case 43: */
+		/* 	case 42: */
+		/* 	case 41: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 40: */
+		/* 	case 39: */
+		/* 	case 38: */
+		/* 	case 37: */
+		/* 	case 36: */
+		/* 	case 35: */
+		/* 	case 34: */
+		/* 	case 33: */
+		/* 	case 32: */
+		/* 	case 31: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 30: */
+		/* 	case 29: */
+		/* 	case 28: */
+		/* 	case 27: */
+		/* 	case 26: */
+		/* 	case 25: */
+		/* 	case 24: */
+		/* 	case 23: */
+		/* 	case 22: */
+		/* 	case 21: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 20: */
+		/* 	case 19: */
+		/* 	case 18: */
+		/* 	case 17: */
+		/* 	case 16: */
+		/* 	case 15: */
+		/* 	case 14: */
+		/* 	case 13: */
+		/* 	case 12: */
+		/* 	case 11: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 10: */
+		/* 	case 9: */
+		/* 	case 8: */
+		/* 	case 7: */
+		/* 	case 6: */
+		/* 	case 5: */
+		/* 	case 4: */
+		/* 	case 3: */
+		/* 	case 2: */
+		/* 	case 1: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	default: */
+		/* 		continue; */
 				
-		}
+		/* } */
 		
 		/* if (current[i].f != 0) { */
 		/* 	SDL_SetRenderDrawColor(renderer, 0x01 * current[i].f / 2, 0x01 * current[i].f / 2, 0x02 * current[i].f, 0xff); */
