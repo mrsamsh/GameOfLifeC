@@ -19,16 +19,16 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 typedef struct Cell {
-	int8_t v;
-	int8_t f;
-	int8_t *nw;
-	int8_t *n;
-	int8_t *ne;
-	int8_t *w;
-	int8_t *e;
-	int8_t *sw;
-	int8_t *s;
-	int8_t *se;
+	uint32_t v;
+	uint32_t f;
+	uint32_t *nw;
+	uint32_t *n;
+	uint32_t *ne;
+	uint32_t *w;
+	uint32_t *e;
+	uint32_t *sw;
+	uint32_t *s;
+	uint32_t *se;
 } Cell;
 
 int width, height, side, starting_cells;
@@ -36,7 +36,7 @@ Cell *state1;
 Cell *state2;
 Cell *current;
 Cell *next;
-SDL_Rect *rects;
+SDL_Rect fullscreen, *rects;
 
 int Cell_Calculate(const Cell *cell) {
 	return *(cell->nw) + *(cell->n) + *(cell->ne) + *(cell->w) + *(cell->e) + *(cell->sw) + *(cell->s) + *(cell->se);
@@ -46,11 +46,15 @@ void Game_Init(int grid_width, int grid_height, int cell_side, int starting) {
 	width = grid_width;
 	height = grid_height;
 	side = cell_side;
-	starting_cells = starting;
+	starting_cells = width * height / 6;
 	state1 = malloc(sizeof(Cell) * width * height);
 	state2 = malloc(sizeof(Cell) * width * height);
 	current = state1;
 	next = state2;
+	fullscreen.x = 0;
+	fullscreen.y = 0;
+	fullscreen.w = width * side;
+	fullscreen.h = height * side;
 
 	for (int y = 1; y < height - 1; ++y) {
 		for (int x = 1; x < width - 1; ++x) {
@@ -450,6 +454,8 @@ void Game_EvaluateCells(SDL_Renderer *renderer, int paused) {
 
 void *Game_Draw(void *r) {
 	SDL_Renderer *renderer = (SDL_Renderer *)r;
+	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xc0);
+	SDL_RenderFillRect(renderer, &fullscreen);
 	for (int i = 0; i < width * height; ++i) {
 
 		if (current[i].v == 1) {
@@ -457,46 +463,46 @@ void *Game_Draw(void *r) {
 			SDL_RenderFillRect(renderer, &rects[i]);
 			continue;
 		}
-		switch (current[i].f) {
-			case 20:
-			case 19:
-			case 18:
-			case 17:
-				SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 16:
-			case 15:
-			case 14:
-			case 13:
-				SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 12:
-			case 11:
-			case 10:
-			case 9:
-				SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 8:
-			case 7:
-			case 6:
-			case 5:
-				SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			case 4:
-			case 3:
-			case 2:
-			case 1:
-				SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff);
-				SDL_RenderFillRect(renderer, &rects[i]);
-				continue;
-			default:
-				continue;
+		/* switch (current[i].f) { */
+		/* 	case 20: */
+		/* 	case 19: */
+		/* 	case 18: */
+		/* 	case 17: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x25, 0x25, 0xa0, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 16: */
+		/* 	case 15: */
+		/* 	case 14: */
+		/* 	case 13: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x20, 0x20, 0x80, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 12: */
+		/* 	case 11: */
+		/* 	case 10: */
+		/* 	case 9: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x15, 0x15, 0x60, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 8: */
+		/* 	case 7: */
+		/* 	case 6: */
+		/* 	case 5: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x10, 0x10, 0x40, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	case 4: */
+		/* 	case 3: */
+		/* 	case 2: */
+		/* 	case 1: */
+		/* 		SDL_SetRenderDrawColor(renderer, 0x05, 0x05, 0x20, 0xff); */
+		/* 		SDL_RenderFillRect(renderer, &rects[i]); */
+		/* 		continue; */
+		/* 	default: */
+		/* 		continue; */
 				
-		}
+		/* } */
 	}
 	return NULL;
 }

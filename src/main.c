@@ -90,6 +90,7 @@ int main()
 	
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	uint32_t last, current;
 	uint32_t mspf = 1000 / c.fps;
@@ -140,8 +141,6 @@ int main()
 			}
 		}
 		
-		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x66);
-		SDL_RenderClear(renderer);
 		uint32_t beforeEval = SDL_GetTicks();
 		Game_EvaluateCells(renderer, paused);
 		uint32_t afterEval = SDL_GetTicks();
