@@ -11,7 +11,11 @@ width
 height
 cell_side
 frames_per_second
+display_number (if you have multiple monitors attached)
 ```
+You can copy config.txt.sample to config.txt and edit the latter.
+
+Note that currently only high dpi monitors are supported.
 
 Just cd to project folder and type:
 ```bash
