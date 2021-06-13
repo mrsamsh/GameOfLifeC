@@ -1,4 +1,4 @@
-CFLAGS=-I./include -O3
+CFLAGS=-I./include -O3 -DTHREAD_RUN
 LFLAGS=-lSDL2 -lpthread
 
 UNAME=$(shell uname)
@@ -28,7 +28,7 @@ $(BUILD_DIR)/$(BIN): $(OBJS)
 	$(CC) $(LFLAGS) $(DFLAGS) $^ -o $@
 	
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(DFLAGS) $(TFLAGS) -MMD -c $< -o $@
+	$(CC) $(CFLAGS) $(DFLAGS) -MMD -c $< -o $@
 
 prepare:
 	@mkdir -p $(OBJ_DIR)
@@ -39,9 +39,6 @@ ifeq ($(UNAME), Darwin)
 	dsymutil $(BUILD_DIR)/$(BIN)
 endif
 	
-thread: TFLAGS=-DTHREAD_RUN
-thread: clean all	
-
 .PHONY: clean
 	
 clean:
