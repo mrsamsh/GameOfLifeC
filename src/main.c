@@ -49,20 +49,20 @@ int8_t square[] = {
 	1, 1
 };
 
-struct { int window_width, window_height, side, fps, display; } c;
+struct { int window_width, window_height, side, starting_cells_percent, fps, display; } c;
 
 int main()
 {
 	FILE *file;
 	file = fopen("config.txt", "r");
-	fscanf(file, "%d\n%d\n%d\n%d\n%d", &c.window_width, &c.window_height, &c.side, &c.fps, &c.display);
+	fscanf(file, "%d %d %d %d %d %d", &c.window_width, &c.window_height, &c.side, &c.starting_cells_percent, &c.fps, &c.display);
 		
 	int window_width = c.window_width;
 	int window_height = c.window_height;
 	int side = c.side;
 	int grid_width = window_width / side;
 	int grid_height = window_height / side;
-	int starting_cells = (window_width * window_height) / (side * 70);
+	int starting_cells = c.starting_cells_percent * grid_width * grid_height / 100;
 
 	Game_Init(grid_width, grid_height, side, starting_cells);
 	

@@ -46,7 +46,7 @@ void Game_Init(int grid_width, int grid_height, int cell_side, int starting) {
 	width = grid_width;
 	height = grid_height;
 	side = cell_side;
-	starting_cells = width * height / 6;
+	starting_cells = starting;
 	state1 = malloc(sizeof(Cell) * width * height);
 	state2 = malloc(sizeof(Cell) * width * height);
 	current = state1;
