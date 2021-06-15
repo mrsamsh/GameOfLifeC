@@ -10,6 +10,7 @@ You can play with screensize and cell side in config file, it is arranged as:
 width
 height
 cell_side
+starting_cell_percentage(1-100)
 frames_per_second
 display_number (if you have multiple monitors attached)
 ```
