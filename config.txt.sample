@@ -1,7 +1,7 @@
-2560
-1600
-3
-20
-60
-1
-
+width=1920
+height=1080
+side=4
+starting_cell_percent=30
+fps=60
+display=2
+hidpi=0
