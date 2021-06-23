@@ -238,8 +238,8 @@ void Game_Init(int grid_width, int grid_height, int cell_side, int starting) {
 	rects = malloc(sizeof(SDL_Rect) * width * height);
 
 	for (int i = 0; i < width * height; ++i) {
-		int x = (i % width) * side + 1;
-		int y = (i / width) * side + 1;
+		int x = (i % width) * side;
+		int y = (i / width) * side;
 		rects[i] = (SDL_Rect){ x, y, side - 1, side -1 };
 	}
 }
