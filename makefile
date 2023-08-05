@@ -1,5 +1,5 @@
-CFLAGS=-I./include -O3 -DTHREAD_RUN
-LFLAGS=-lSDL2 -lpthread
+CFLAGS=-I./include -O3
+LFLAGS=-lSDL2 -lm
 
 UNAME=$(shell uname)
 ifeq ($(UNAME), Darwin)

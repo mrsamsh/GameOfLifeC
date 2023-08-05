@@ -73,29 +73,29 @@ int main()
 	int hidpi = c.hidpi;
 
 	Game_Init(grid_width, grid_height, side, starting_cells);
-	
+
 	Game_GenerateRandom();
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_Window* window = SDL_CreateWindow(
-										  "Game of Life",
-										  SDL_WINDOWPOS_CENTERED_DISPLAY(c.display),
-										  SDL_WINDOWPOS_CENTERED_DISPLAY(c.display),
-										  hidpi == 1 ? (window_width / 2) : window_width,
-										  hidpi == 1 ? (window_height / 2) : window_height,
-										  SDL_WINDOW_SHOWN
-										  | SDL_WINDOW_ALLOW_HIGHDPI
-										  | SDL_WINDOW_FULLSCREEN_DESKTOP
-										  | SDL_WINDOW_RESIZABLE
-										  );
-	
+			"Game of Life",
+			SDL_WINDOWPOS_CENTERED_DISPLAY(c.display),
+			SDL_WINDOWPOS_CENTERED_DISPLAY(c.display),
+			hidpi == 1 ? (window_width / 2) : window_width,
+			hidpi == 1 ? (window_height / 2) : window_height,
+			SDL_WINDOW_SHOWN
+			| SDL_WINDOW_ALLOW_HIGHDPI
+			| SDL_WINDOW_FULLSCREEN_DESKTOP
+			| SDL_WINDOW_RESIZABLE
+			);
+
 	SDL_Renderer* renderer = SDL_CreateRenderer(
-												window,
-												-1,
-												SDL_RENDERER_ACCELERATED
-												| SDL_RENDERER_PRESENTVSYNC
-												);
-	
+			window,
+			-1,
+			SDL_RENDERER_ACCELERATED
+			| SDL_RENDERER_PRESENTVSYNC
+			);
+
 	SDL_ShowCursor(SDL_DISABLE);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -150,11 +150,11 @@ int main()
 				}
 			}
 		}
-		
+
 		uint32_t beforeEval = SDL_GetTicks();
 		Game_EvaluateCells(renderer, paused);
 		uint32_t afterEval = SDL_GetTicks();
-		
+
 		SDL_RenderPresent(renderer);
 		current = SDL_GetTicks();
 		uint32_t delta = current - last;
